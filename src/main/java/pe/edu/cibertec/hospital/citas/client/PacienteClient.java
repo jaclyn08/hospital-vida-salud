@@ -24,17 +24,14 @@ public class PacienteClient {
         this.webClient = webClientBuilder.baseUrl(pacientesUrl).build();
     }
 
-    /**
-     * Consulta sincrona reactiva al microservicio de pacientes con timeout y manejo de errores.
-     */
     public Mono<PacienteDTO> obtenerPacientePorId(Long pacienteId) {
-        log.info("Consultando de forma sincrona al servicio de pacientes para ID: {}", pacienteId);
+        log.info("Consultando al servicio de pacientes para ID: {}", pacienteId);
 
         return webClient.get()
                 .uri("/api/pacientes/{id}", pacienteId)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response ->
-                        Mono.error(new ReglaNegocioException("El paciente con ID " + pacienteId + " no existe o no se encuentra activo (RN-02)."))
+                        Mono.error(new ReglaNegocioException("El paciente con ID " + pacienteId + " no existe o no se encuentra activo."))
                 )
                 .bodyToMono(PacienteDTO.class)
                 .timeout(Duration.ofSeconds(3));

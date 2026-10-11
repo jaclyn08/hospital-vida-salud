@@ -42,21 +42,17 @@ public class CitaServiceImpl implements CitaService {
     public Mono<CitaResponseDTO> registrarCita(CitaCreateRequest request) {
         log.info("Iniciando registro reactivo de cita: {}", request.getCodigoCita());
 
-        // 1. Validacion sincrona reactiva de existencia del paciente (RN-02 -> 400 Bad Request si no existe)
         return pacienteClient.obtenerPacientePorId(request.getPacienteId())
                 .switchIfEmpty(Mono.error(new ReglaNegocioException("El paciente especificado no existe o no se encuentra activo.")))
-                // 2. Validar que no exista ya una cita con el mismo codigo
                 .flatMap(paciente -> citaRepository.findByCodigoCita(request.getCodigoCita())
                         .flatMap(existe -> Mono.<Void>error(new ReglaNegocioException("Ya existe una cita registrada con el codigo: " + request.getCodigoCita())))
                         .then()
                 )
-                // 3. Validar disponibilidad del profesional en la fecha y hora
                 .then(Mono.defer(() -> citaRepository.findByProfesionalCodigoAndFechaHora(request.getProfesionalCodigo(), request.getFechaHora())
                         .flatMap(conflicto -> Mono.<Void>error(new ReglaNegocioException(
                                 "El profesional " + request.getProfesionalCodigo() + " ya cuenta con una cita en el horario " + request.getFechaHora())))
                         .then()
                 ))
-                // 4. Validar que el paciente no tenga cita simultanea
                 .then(Mono.defer(() -> citaRepository.existsByPacienteIdAndFechaHora(request.getPacienteId(), request.getFechaHora())
                         .flatMap(existe -> {
                             if (Boolean.TRUE.equals(existe)) {
@@ -65,7 +61,6 @@ public class CitaServiceImpl implements CitaService {
                             return Mono.empty();
                         })
                 ))
-                // 5. Construccion y persistencia reactiva en R2DBC
                 .then(Mono.defer(() -> {
                     LocalDateTime ahora = LocalDateTime.now();
                     Cita nuevaCita = Cita.builder()
@@ -113,10 +108,9 @@ public class CitaServiceImpl implements CitaService {
                 .flatMap(cita -> {
                     String estadoActual = cita.getEstado();
 
-                    // Regla RN-04: Solo citas PENDIENTE pueden ser CONFIRMADAS -> 422 Unprocessable Entity
                     if (!"PENDIENTE".equalsIgnoreCase(estadoActual)) {
                         return Mono.error(new TransicionEstadoInvalidaException(
-                                "No se puede confirmar una cita en estado: " + estadoActual + ". Solo se admiten citas en estado PENDIENTE (RN-04)."));
+                                "No se puede confirmar una cita en estado: " + estadoActual + ". Solo se admiten citas en estado PENDIENTE."));
                     }
 
                     cita.setEstado("CONFIRMADA");
@@ -124,14 +118,15 @@ public class CitaServiceImpl implements CitaService {
 
                     return citaRepository.save(cita)
                             .flatMap(citaGuardada -> {
-                                // Disparo de evento a RabbitMQ
                                 CitaConfirmadaEvent event = CitaConfirmadaEvent.builder()
                                         .eventoId(UUID.randomUUID().toString())
                                         .tipoEvento("CITA_CONFIRMADA")
                                         .citaId(citaGuardada.getId())
+                                        .codigoCita(citaGuardada.getCodigoCita())
                                         .pacienteId(citaGuardada.getPacienteId())
                                         .especialidad(citaGuardada.getEspecialidad())
                                         .fechaHora(citaGuardada.getFechaHora().toString())
+                                        .estado("CONFIRMADA")
                                         .timestamp(LocalDateTime.now().toString())
                                         .build();
 
@@ -150,10 +145,9 @@ public class CitaServiceImpl implements CitaService {
                 .flatMap(cita -> {
                     String estadoActual = cita.getEstado();
 
-                    // Regla RN-04
                     if ("CANCELADA".equalsIgnoreCase(estadoActual) || "ATENDIDA".equalsIgnoreCase(estadoActual)) {
                         return Mono.error(new TransicionEstadoInvalidaException(
-                                "No se puede cancelar una cita en estado: " + estadoActual + " (RN-04)"));
+                                "No se puede cancelar una cita en estado: " + estadoActual));
                     }
 
                     cita.setEstado("CANCELADA");

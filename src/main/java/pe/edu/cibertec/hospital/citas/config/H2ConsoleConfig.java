@@ -21,9 +21,7 @@ public class H2ConsoleConfig {
     @EventListener(ContextRefreshedEvent.class)
     public void startH2Servers() {
         try {
-            // Servidor web para acceder a la consola H2 desde el navegador en http://localhost:8085
             this.webServer = Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8085").start();
-            // Servidor TCP para conectar herramientas como DBeaver o IntelliJ en el puerto 9092
             this.tcpServer = Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9092").start();
             log.info("[H2 CONSOLE] Servidor Web H2 activo en: http://localhost:8085 (JDBC URL: jdbc:h2:mem:citasdb)");
             log.info("[H2 CONSOLE] Servidor TCP H2 activo en: localhost:9092 para DBeaver / IntelliJ");

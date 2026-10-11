@@ -18,7 +18,6 @@ public class PacienteMockController {
     private final Map<String, Long> documentosDb = new ConcurrentHashMap<>();
 
     public PacienteMockController() {
-        // Paciente inicial de prueba
         PacienteDTO p1 = PacienteDTO.builder()
                 .id(1L)
                 .tipoDocumento("DNI")
@@ -36,7 +35,7 @@ public class PacienteMockController {
     public Mono<PacienteDTO> registrarPaciente(@RequestBody PacienteDTO request) {
         if (request.getNumeroDocumento() != null && documentosDb.containsKey(request.getNumeroDocumento())) {
             return Mono.error(new DocumentoDuplicadoException(
-                    "El paciente con documento " + request.getNumeroDocumento() + " ya se encuentra registrado (RN-01)."));
+                    "El paciente con documento " + request.getNumeroDocumento() + " ya se encuentra registrado."));
         }
 
         long nuevoId = pacientesDb.size() + 1L;
@@ -57,7 +56,7 @@ public class PacienteMockController {
     public Mono<PacienteDTO> obtenerPaciente(@PathVariable Long id) {
         PacienteDTO paciente = pacientesDb.get(id);
         if (paciente == null) {
-            return Mono.error(new RecursoNoEncontradoException("El paciente con ID " + id + " no existe (RN-02)."));
+            return Mono.error(new RecursoNoEncontradoException("El paciente con ID " + id + " no existe."));
         }
         return Mono.just(paciente);
     }
