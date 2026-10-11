@@ -1,0 +1,28 @@
+name: Integracion Continua - Hospital Vida Salud
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Asignar permisos a Maven Wrapper
+        run: chmod +x ./mvnw
+
+      - name: Compilar y ejecutar pruebas con Maven
+        run: ./mvnw --batch-mode verify

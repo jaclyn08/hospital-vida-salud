@@ -1,0 +1,28 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+hospital:
+  rabbitmq:
+    exchange: hospital.exchange
+    queue:
+      notificaciones: hospital.citas.notificaciones.queue
+      auditoria: hospital.citas.auditoria.queue
+    routingkey:
+      cita-confirmada: cita.confirmada
