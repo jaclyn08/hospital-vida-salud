@@ -149,10 +149,5 @@ class CitaServiceTest {
                 .verify();
     }
 
-    @Test
-    void algunTestExistente() {
-
-        org.junit.jupiter.api.Assertions.assertTrue(false, "Fallo provocado para evidencia 7.16");
-    }
 
 }
