@@ -158,5 +158,9 @@ class CitaServiceTest {
                 .expectError(RecursoNoEncontradoException.class)
                 .verify();
     }
+    @org.junit.jupiter.api.Test
+    void testEvidenciaFalloCI() {
+        org.junit.jupiter.api.Assertions.assertEquals(1, 2, "Fallo provocado para evidencia de CI/CD");
+    }
 
 }
