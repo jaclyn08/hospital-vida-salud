@@ -138,7 +138,7 @@ class CitaServiceTest {
     }
 
     @Test
-    @DisplayName("Debe rechazar cancelar cita si ya estaba cancelada (RN-04)")
+    @DisplayName("Debe rechazar cancelar cita si ya estaba cancelada")
     void cancelarCita_YaCancelada_Rechaza() {
         citaMock.setEstado("CANCELADA");
         when(citaRepository.findById(1L)).thenReturn(Mono.just(citaMock));
@@ -157,10 +157,6 @@ class CitaServiceTest {
         StepVerifier.create(citaService.obtenerCitaPorId(99L))
                 .expectError(RecursoNoEncontradoException.class)
                 .verify();
-    }
-    @org.junit.jupiter.api.Test
-    void testEvidenciaFalloCI() {
-        org.junit.jupiter.api.Assertions.assertEquals(1, 2, "Fallo provocado para evidencia de CI/CD");
     }
 
 }

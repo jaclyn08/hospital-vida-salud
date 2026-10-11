@@ -5,19 +5,16 @@ spring:
   application:
     name: citas-service
 
-  # Persistencia Reactiva SQL con R2DBC (H2 reactivo por defecto para pruebas y PostgreSQL en produccion)
   r2dbc:
     url: ${SPRING_R2DBC_URL:r2dbc:h2:mem:///citasdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
     username: ${SPRING_R2DBC_USERNAME:sa}
     password: ${SPRING_R2DBC_PASSWORD:}
 
-  # Inicializacion automatica del esquema reactivo
   sql:
     init:
       mode: always
       schema-locations: classpath:schema.sql
 
-  # RabbitMQ para mensajeria asincrona (CloudAMQP)
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:capybara.lmq.cloudamqp.com}
     port: ${SPRING_RABBITMQ_PORT:5671}
@@ -30,7 +27,6 @@ spring:
       simple:
         auto-startup: ${SPRING_RABBITMQ_LISTENER_AUTO_STARTUP:true}
 
-# Eureka Client para registro y descubrimiento dinamico
 eureka:
   client:
     service-url:
@@ -41,7 +37,6 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
 
-# Configuracion de Colas y Exchanges de RabbitMQ (Especificacion Hospital Vida Salud)
 hospital:
   rabbitmq:
     exchange: hospital.exchange
@@ -51,7 +46,6 @@ hospital:
     routingkey:
       cita-confirmada: cita.confirmada
 
-# URLs de servicios externos para comunicacion sincrona
 services:
   pacientes:
     url: ${SERVICES_PACIENTES_URL:http://localhost:8082}

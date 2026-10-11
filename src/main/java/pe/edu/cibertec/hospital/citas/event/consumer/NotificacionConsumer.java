@@ -13,10 +13,10 @@ public class NotificacionConsumer {
 
     @RabbitListener(queues = "${hospital.rabbitmq.queue.notificaciones:hospital.citas.notificaciones.queue}")
     public void recibirNotificacion(CitaConfirmadaEvent event) {
-        log.info("[RABBITMQ LISTENER - NOTIFICACIONES] Mensaje recibido exitosamente desde cola 'hospital.citas.notificaciones.queue': [CitaId: {}, PacienteId: {}, Especialidad: {}, FechaHora: {}]",
-                event.getCitaId(), event.getPacienteId(), event.getEspecialidad(), event.getFechaHora());
-        log.info("[RABBITMQ LISTENER - NOTIFICACIONES] Simulando envio reactivo de SMS / Correo de confirmacion al paciente ID: {}",
-                event.getPacienteId());
+        log.info("[RABBITMQ LISTENER - NOTIFICACIONES] Mensaje recibido desde cola 'hospital.citas.notificaciones.queue': [CitaId: {}, PacienteId: {}, Especialidad: {}]",
+                event.getCitaId(), event.getPacienteId(), event.getEspecialidad());
+        log.info("[RABBITMQ LISTENER - NOTIFICACIONES] Notificacion enviada al paciente ID: {} para la cita ID: {}",
+                event.getPacienteId(), event.getCitaId());
     }
 
 }

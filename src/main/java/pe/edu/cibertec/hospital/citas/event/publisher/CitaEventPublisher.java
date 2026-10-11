@@ -25,10 +25,6 @@ public class CitaEventPublisher {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    /**
-     * Publica de forma asincrona un evento de cita confirmada hacia RabbitMQ sin bloquear el flujo reactivo.
-     * Incorpora resiliencia y simulacion academica en caso el broker local no este activo.
-     */
     public Mono<Void> publicarCitaConfirmada(CitaConfirmadaEvent event) {
         return Mono.fromRunnable(() -> {
             try {
