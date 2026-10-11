@@ -150,13 +150,9 @@ class CitaServiceTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar RecursoNoEncontradoException cuando la cita no existe")
-    void obtenerCitaPorId_Inexistente_Error() {
-        when(citaRepository.findById(99L)).thenReturn(Mono.empty());
+    void algunTestExistente() {
 
-        StepVerifier.create(citaService.obtenerCitaPorId(99L))
-                .expectError(RecursoNoEncontradoException.class)
-                .verify();
+        org.junit.jupiter.api.Assertions.assertTrue(false, "Fallo provocado para evidencia 7.16");
     }
 
 }
